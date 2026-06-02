@@ -27,3 +27,20 @@ jobs:
 
       - name: Run Tests
         run: pytest
+  pr-comment:
+    needs: build-and-test 
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    if: github.event_name == 'pull_request' 
+    steps:
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚀 All CI checks (formatting, linting, and unit tests) have passed successfully! This PR is ready for review.'
+            })
